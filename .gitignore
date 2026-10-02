@@ -1,0 +1,29 @@
+# Local environments and secrets
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Competition data and generated artifacts
+data/raw/
+data/processed/
+data/cache/
+outputs/
+models/
+checkpoints/
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.onnx
+
+# Python/tooling
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
