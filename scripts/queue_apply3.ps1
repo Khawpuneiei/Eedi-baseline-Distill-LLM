@@ -89,18 +89,23 @@ function Test-RawData { -not ($needed | Where-Object { -not (Test-Path (Join-Pat
 
 Log '==== Apply 3 queue started (scale B) ===='
 if (-not (Test-RawData)) {
-    $kaggleJson = Join-Path $env:USERPROFILE '.kaggle\kaggle.json'
+    # Kaggle's KGAT_ API tokens live in ~/.kaggle/access_token and need kaggle>=1.8 (Python 3.11+),
+    # so the CLI gets its own venv; the legacy kaggle.json also works with it.
+    $kaggleDir = Join-Path $env:USERPROFILE '.kaggle'
+    $python312 = Join-Path $env:LOCALAPPDATA 'Programs\Python\Python312\python.exe'
+    $kaggleVenv = Join-Path $root '.tools\kaggle'
     while (-not (Test-RawData)) {
-        if (-not (Test-Path $kaggleJson)) {
-            Set-Status "waiting for $kaggleJson (or the three CSVs in data\raw)"
+        if (-not ((Test-Path (Join-Path $kaggleDir 'access_token')) -or (Test-Path (Join-Path $kaggleDir 'kaggle.json')))) {
+            Set-Status "waiting for $kaggleDir\access_token or kaggle.json (or the three CSVs in data\raw)"
             Start-Sleep -Seconds 120
             continue
         }
         Set-Status 'downloading Eedi data from Kaggle'
         New-Item -ItemType Directory -Force $raw | Out-Null
-        $kaggle = Join-Path $root '.venv\Scripts\kaggle.exe'
+        $kaggle = Join-Path $kaggleVenv 'Scripts\kaggle.exe'
         if (-not (Test-Path $kaggle)) {
-            $p = Start-Process -FilePath $py -ArgumentList '-m','pip','install','-q','kaggle==1.6.17' `
+            & $python312 -m venv $kaggleVenv
+            $p = Start-Process -FilePath (Join-Path $kaggleVenv 'Scripts\python.exe') -ArgumentList '-m','pip','install','-q','kaggle' `
                 -RedirectStandardOutput (Join-Path $logDir 'pip_kaggle.out.log') `
                 -RedirectStandardError (Join-Path $logDir 'pip_kaggle.err.log') -NoNewWindow -Wait -PassThru
             if ($p.ExitCode -ne 0) { Log 'pip install kaggle failed; retrying in 10 min'; Start-Sleep 600; continue }
