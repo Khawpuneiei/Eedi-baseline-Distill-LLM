@@ -1,0 +1,21 @@
+{
+  "model_id": "BAAI/bge-small-en-v1.5",
+  "model_revision": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+  "parameters": {
+    "batch_size": 32,
+    "device_requested": "auto",
+    "epochs": 2,
+    "learning_rate": 2e-05,
+    "max_length": 256,
+    "seed": 42
+  },
+  "runtime": {
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python": "3.10.4",
+    "torch": "2.5.1+cu121"
+  },
+  "schema_version": 1,
+  "training_data_sha256": "73c7044ef6bf50ce18abb3a539e3d7b05916eb929bb7af750d29aeea277a6452",
+  "training_record_count": 3511
+}

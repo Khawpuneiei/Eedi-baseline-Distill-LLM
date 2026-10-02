@@ -1,0 +1,29 @@
+{
+  "catalog_sha256": "7cd4b68019c8fa8883f689c5fe469614efeb6f20c1871c98bb76fe77d5b33780",
+  "model_id": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+  "model_revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+  "parameters": {
+    "batch_size": 32,
+    "device_requested": "auto",
+    "epochs": 1,
+    "learning_rate": 2e-05,
+    "max_length": 256,
+    "random_negatives": 4,
+    "seed": 42,
+    "top_k": 25
+  },
+  "rationale_cache_sha256": null,
+  "retrieved_query_count": 3511,
+  "retriever_model_id": "BAAI/bge-small-en-v1.5",
+  "retriever_model_revision": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+  "runtime": {
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python": "3.10.4",
+    "torch": "2.5.1+cu121"
+  },
+  "schema_version": 1,
+  "training_data_sha256": "73c7044ef6bf50ce18abb3a539e3d7b05916eb929bb7af750d29aeea277a6452",
+  "training_pair_count": 102529,
+  "training_record_count": 3511
+}

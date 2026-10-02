@@ -1,0 +1,13 @@
+{
+  "reranker": {
+    "map_at_k": 0.25904875741367445,
+    "query_count": 859,
+    "recall_at_k": 0.6903376018626309
+  },
+  "retriever": {
+    "map_at_k": 0.2309433648861515,
+    "query_count": 859,
+    "recall_at_k": 0.6903376018626309
+  }
+}
+Evaluation artifacts written to outputs\validation

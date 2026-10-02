@@ -1,0 +1,30 @@
+{
+  "counts": {
+    "misconceptions": 2587,
+    "test": 9,
+    "train": 3511,
+    "train_questions": 1495,
+    "validation": 859,
+    "validation_questions": 374
+  },
+  "outputs": [
+    "train.jsonl",
+    "validation.jsonl",
+    "test.jsonl",
+    "catalog.json"
+  ],
+  "schema_version": 1,
+  "seed": 42,
+  "source_files": {
+    "misconception_mapping.csv": {
+      "sha256": "2b2fd9c031084b11fe486435c823452e5ef1a8edc1fa47ab7fa676ffe141a507"
+    },
+    "test.csv": {
+      "sha256": "1f41378f411b51f2217beee8f3031c7c529867a6b2c1666268020fa3298326fd"
+    },
+    "train.csv": {
+      "sha256": "31fbea4fdb250fc67a8254aba0764100e89db71a43ea74d2f123ef1c95545187"
+    }
+  },
+  "validation_fraction": 0.2
+}

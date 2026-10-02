@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "C:\Python310\lib\runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "C:\Python310\lib\runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "C:\Users\user\OneDrive\เอกสาร\ChatGPT\Distill\eedi-baseline\scripts\prepare_data.py", line 136, in <module>
+    raise SystemExit(main())
+  File "C:\Users\user\OneDrive\เอกสาร\ChatGPT\Distill\eedi-baseline\scripts\prepare_data.py", line 122, in main
+    manifest = prepare_dataset(
+  File "C:\Users\user\OneDrive\เอกสาร\ChatGPT\Distill\eedi-baseline\scripts\prepare_data.py", line 60, in prepare_dataset
+    labeled = expand_training_rows(read_csv_rows(train_file), mapping)
+  File "C:\Users\user\OneDrive\เอกสาร\ChatGPT\Distill\eedi-baseline\eedi_baseline\data.py", line 194, in expand_training_rows
+    raise DataValidationError(
+eedi_baseline.data.DataValidationError: question '0' has an empty misconception label for incorrect answer B (0_B)

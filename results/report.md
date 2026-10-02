@@ -1,0 +1,34 @@
+# Eedi validation results
+
+Primary metric: MAP@25. All conditions must use the same question-grouped validation split.
+
+| Condition | Queries | MAP@25 | Recall@25 |
+|---|---:|---:|---:|
+| Retrieval baseline | 859 | 0.2309 | 0.6903 |
+| Reranker | 859 | 0.2590 | 0.6903 |
+| Rationale reranker | 859 | 0.2636 | 0.6903 |
+
+## Run metadata
+
+- **batch_size:** 64
+- **catalog_sha256:** 7cd4b68019c8fa8883f689c5fe469614efeb6f20c1871c98bb76fe77d5b33780
+- **created_at_utc:** 2026-10-02T23:02:04.931407+00:00
+- **cuda_available:** True
+- **device_requested:** auto
+- **gpu_name:** NVIDIA GeForce RTX 4060 Laptop GPU
+- **k:** 25
+- **python:** 3.10.4
+- **rationale_cache_sha256:** 6eb39f4ee191156048387d5736e3f96e2acab1b25222ffab6e1950c9dcbab22f
+- **rationale_provenance:** {'teacher_model': 'Qwen/Qwen2.5-1.5B-Instruct', 'teacher_revision': '989aa7980e4cf806f80c7fef2b1adb7bc71aa306', 'prompt_version': 'eedi-error-rationale-v1'}
+- **rationale_reranker_model_id:** cross-encoder/ms-marco-MiniLM-L-6-v2
+- **rationale_reranker_model_revision:** 233902d25c440f23af6f7d6e94d2946bac0bee0a
+- **reranker_model_id:** cross-encoder/ms-marco-MiniLM-L-6-v2
+- **reranker_model_revision:** 233902d25c440f23af6f7d6e94d2946bac0bee0a
+- **retriever_model_id:** BAAI/bge-small-en-v1.5
+- **retriever_model_revision:** 5c38ec7c405ec4b44b94cc5a9bb96e735b38267a
+- **torch:** 2.5.1+cu121
+- **transformers:** 4.52.4
+- **validation_query_count:** 859
+- **validation_sha256:** f186d64229414acc0d972abfa6f153e770d96dee879d0103f3fc2d08038ccefc
+
+Scores are generated from saved validation predictions; no score is inferred for a condition that was not run.

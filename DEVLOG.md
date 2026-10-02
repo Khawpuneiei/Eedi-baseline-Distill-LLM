@@ -205,3 +205,17 @@ No experiment has run.
     skipped instead of aborting preparation (the Kaggle convention).
 - Prepared: 1,869 questions → 4,370 labeled queries; 2,587 catalog misconceptions. Question-grouped
   split (seed 42, 20%): 3,511 train queries / 1,495 questions, 859 validation queries / 374 questions.
+
+## 2026-10-03 — Scale-B validation run (queued)
+
+- Retriever BAAI/bge-small-en-v1.5 (2 epochs, batch 32, max length 256); reranker
+  cross-encoder/ms-marco-MiniLM-L-6-v2 (1 epoch, batch 32); rationale teacher Qwen/Qwen2.5-1.5B-Instruct
+  (downscaled from Qwen2.5-7B to fit the 6 h / 8 GiB budget). Split seed 42, 20% grouped validation.
+- GPU wall time for training, rationale generation, and evaluation: 0.46 h.
+- Full metrics, data hashes, and step logs are in `results/`.
+
+| Condition | Queries | MAP@25 | Recall@25 |
+|---|---:|---:|---:|
+| rationale | 859 | 0.2636 | 0.6903 |
+| reranker | 859 | 0.2590 | 0.6903 |
+| retriever | 859 | 0.2309 | 0.6903 |
