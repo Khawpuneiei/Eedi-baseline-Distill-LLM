@@ -194,3 +194,14 @@ No experiment has run.
   the report to `results/`, appends the ledger here, and commits/pushes.
 - Dry run: every step of the queue ran end to end on CPU against a 30-question synthetic CSV in the
   real Kaggle format, using Qwen2.5-0.5B as a stand-in teacher. Those metrics are runtime checks only.
+
+## 2026-10-02 — Real Kaggle data prepared
+
+- Data downloaded with the Kaggle CLI (new `KGAT_` token in `~/.kaggle/access_token`; the CLI runs from
+  a Python 3.12 venv in `.tools/` because token support needs kaggle>=1.8).
+- Two more schema mismatches surfaced only on the real file and are now fixed and tested (47 tests):
+  - Train labels are float-formatted (`"1672.0"`) while the catalog uses `"1672"`; IDs are canonicalized.
+  - 1,237 of the 5,607 distractors have no misconception label. They cannot be scored, so they are
+    skipped instead of aborting preparation (the Kaggle convention).
+- Prepared: 1,869 questions → 4,370 labeled queries; 2,587 catalog misconceptions. Question-grouped
+  split (seed 42, 20%): 3,511 train queries / 1,495 questions, 859 validation queries / 374 questions.

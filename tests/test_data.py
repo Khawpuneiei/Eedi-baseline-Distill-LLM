@@ -161,13 +161,20 @@ class DataPreparationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "CorrectAnswer"):
             expand_training_rows([row], {"M7": "A misconception", "M8": "Another misconception"})
 
-    def test_training_expansion_rejects_missing_or_empty_wrong_answer_label(self):
+    def test_training_expansion_skips_unlabeled_wrong_answers(self):
         expand_training_rows = self.require_api("expand_training_rows")
-        for missing_label in (None, ""):
+        for missing_label in (None, "", "  "):
             with self.subTest(label=missing_label):
                 row = dict(QUESTION_ROW, MisconceptionA=missing_label)
-                with self.assertRaisesRegex(ValueError, "Q42_A"):
-                    expand_training_rows([row], {"M7": "A misconception", "M8": "Another misconception"})
+                records = expand_training_rows([row], {"M7": "A misconception", "M8": "Another misconception"})
+                self.assertNotIn("Q42_A", [record["query_id"] for record in records])
+                self.assertEqual(len(records), 2)
+
+    def test_training_expansion_maps_float_formatted_kaggle_ids(self):
+        expand_training_rows = self.require_api("expand_training_rows")
+        row = dict(QUESTION_ROW, MisconceptionA="7.0", MisconceptionC="8.00", MisconceptionD="7")
+        records = expand_training_rows([row], {"7": "A misconception", "8": "Another misconception"})
+        self.assertEqual([record["misconception_id"] for record in records], ["7", "8", "7"])
 
     def test_training_expansion_rejects_label_on_correct_answer(self):
         expand_training_rows = self.require_api("expand_training_rows")

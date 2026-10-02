@@ -167,6 +167,15 @@ def _expand_unlabeled_record(question_id: str, answer_key: str, question: str, c
     }
 
 
+def _canonical_misconception_id(label: str) -> str:
+    """Map Kaggle's float-formatted train labels ("1672.0") onto catalog IDs ("1672")."""
+    label = label.strip()
+    integer, dot, fraction = label.partition(".")
+    if dot and integer.isdigit() and fraction and set(fraction) == {"0"}:
+        return integer
+    return label
+
+
 def expand_training_rows(rows: Sequence[Mapping[str, Any]], catalog: Mapping[str, str]) -> list[dict[str, str]]:
     """Expand labeled wide rows into one validated example per incorrect answer."""
     _validate_catalog(catalog)
@@ -190,10 +199,10 @@ def expand_training_rows(rows: Sequence[Mapping[str, Any]], catalog: Mapping[str
                 continue
             query_id = f"{question_id}_{answer_key}"
             label = row[f"Misconception{answer_key}"]
+            # About 22% of Kaggle distractors carry no label; they cannot be scored, so skip them.
             if not isinstance(label, str) or not label.strip():
-                raise DataValidationError(
-                    f"question {question_id!r} has an empty misconception label for incorrect answer {answer_key} ({query_id})"
-                )
+                continue
+            label = _canonical_misconception_id(label)
             if label not in catalog:
                 raise DataValidationError(
                     f"question {question_id!r} answer {answer_key} ({query_id}) references unknown misconception ID {label!r}"
