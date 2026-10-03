@@ -21,6 +21,10 @@ because the wrong answers to one question are correlated.
 | + Reranker (ms-marco-MiniLM-L-6-v2, 1 epoch) | 0.2590 | 0.6903 | +0.028 [+0.001, +0.055] |
 | + Teacher rationale (Qwen2.5-1.5B-Instruct) | 0.2636 | 0.6903 | +0.005 [−0.014, +0.025] |
 
+![Recall at every cutoff](results/figures/recall_curve.png)
+
+![Where the correct misconception lands](results/figures/rank_bins.png)
+
 ### Seen vs. unseen misconceptions
 
 246 validation queries (29%) need a misconception that never appears in the training split.
@@ -29,6 +33,10 @@ because the wrong answers to one question are correlated.
 |---|---:|---:|---:|---:|---|---|
 | Seen in training | 613 | 0.234 | 0.296 | 0.290 | +0.062 [+0.028, +0.096] | −0.006 [−0.030, +0.018] |
 | Never seen | 246 | 0.222 | 0.167 | 0.198 | −0.056 [−0.099, −0.012] | +0.031 [−0.003, +0.067] |
+
+![MAP@25 for seen and unseen misconceptions](results/figures/seen_unseen.png)
+
+![Change in MAP@25 with 95% intervals](results/figures/gains.png)
 
 - Reranking reliably improves on retrieval overall, but only because it learns the training
   misconceptions: it helps on seen ones and **hurts on unseen ones**.
@@ -41,9 +49,14 @@ because the wrong answers to one question are correlated.
 - The teacher was scaled down from the brief's Qwen2.5-7B to fit a 6 h budget on an 8 GiB RTX 4060
   Laptop GPU. The full run took 0.46 GPU hours.
 
+![Per-query wins and losses](results/figures/per_query.png)
+
+![MAP@25 for the largest topics](results/figures/topics.png)
+
 Details are in [`results/`](results/): `metrics.json`, `analysis.json` (rank bins, recall curve,
 seen/unseen, per-query wins and losses, topics, example rationales), and `report.html`, a
-self-contained page of charts. Recompute the analysis with `python -m scripts.analyze_results`.
+self-contained page of charts. Recompute the analysis with `python -m scripts.analyze_results`, then
+redraw these figures with `python -m scripts.plot_results`.
 [`DEVLOG.md`](DEVLOG.md) is the process record.
 
 Untested next steps: a stronger retriever (it sets the ceiling), more reranker epochs, and the 7B
