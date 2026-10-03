@@ -219,3 +219,20 @@ No experiment has run.
 | rationale | 859 | 0.2636 | 0.6903 |
 | reranker | 859 | 0.2590 | 0.6903 |
 | retriever | 859 | 0.2309 | 0.6903 |
+
+### Significance check (paired bootstrap, 2,000 resamples of the 859 validation queries)
+
+| Comparison | ΔMAP@25 | 95% CI |
+|---|---:|---|
+| reranker − retriever | +0.0281 | [+0.0053, +0.0503] |
+| rationale − reranker | +0.0045 | [−0.0127, +0.0220] |
+| rationale − retriever | +0.0326 | [+0.0085, +0.0551] |
+
+- Reranking reliably improves on retrieval. The rationale-distillation lift over the plain reranker is
+  **not distinguishable from zero** at this scale. Queries from the same question are correlated, so
+  query-level resampling, if anything, makes these intervals too narrow.
+- Recall@25 is identical (0.6903) across conditions by construction: rerankers only reorder the retriever's
+  top 25, so 31% of validation queries are unreachable. The retriever is the main ceiling.
+- Untested next steps: the 7B teacher, more reranker epochs, and a stronger retriever (e.g. bge-base).
+  `results/logs/01_prepare_data.*` is from the first queue attempt (header bug, since fixed); the
+  successful preparation was run by hand before the queue restarted.
