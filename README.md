@@ -9,23 +9,31 @@ The optional ablation adds a teacher-generated, one-line description of the
 likely reasoning error to the reranker input. The teacher prompt is label-blind
 and the rationale cache is bound to its query text with a SHA-256 input hash.
 
-## Current status
+## Results (scale B, 2026-10-03)
 
-| Part | Status |
-|---|---|
-| Schema validation and long-format train/test conversion | Implemented; fixture checked |
-| Question-grouped validation split | Implemented; leakage checked |
-| Dense BGE retriever and top-25 ranking | Implemented; model training not run |
-| MiniLM cross-encoder reranker | Implemented; model training not run |
-| Optional Qwen2.5-7B rationale ablation | Implemented; generation not run |
-| MAP@25, Recall@25, per-query predictions, Markdown report | Implemented; hand-checked fixtures pass |
-| Competition data and experiment results | Not present; no experiment run |
+Validation split: 859 queries from 374 held-out questions. All three conditions share the same
+retriever top-25 pools. Intervals come from a paired bootstrap over queries.
 
-See [`DEVLOG.md`](DEVLOG.md) for the process record and [`docs/experiment-design.md`](docs/experiment-design.md)
-for the model and evaluation choices. The local environment has an RTX 4060
-Laptop GPU with 8 GiB VRAM. Compact models are set up for local trials, but no
-GPU training benchmark has been measured. The optional 7B teacher is intended
-for a larger host such as Vast.ai.
+| Condition | MAP@25 | Recall@25 | Δ vs. previous row (95% CI) |
+|---|---:|---:|---|
+| Retriever (bge-small-en-v1.5, 2 epochs) | 0.2309 | 0.6903 | — |
+| + Reranker (ms-marco-MiniLM-L-6-v2, 1 epoch) | 0.2590 | 0.6903 | +0.028 [+0.005, +0.050] |
+| + Teacher rationale (Qwen2.5-1.5B-Instruct) | 0.2636 | 0.6903 | +0.005 [−0.013, +0.022] |
+
+- Reranking reliably improves on retrieval. The rationale-distillation lift is not distinguishable
+  from zero at this scale.
+- Recall@25 is the ceiling: 31% of queries have no gold misconception in the retriever's top 25, and a
+  reranker cannot recover them.
+- The teacher was scaled down from the brief's Qwen2.5-7B to fit a 6 h budget on an 8 GiB RTX 4060
+  Laptop GPU. The full run took 0.46 GPU hours. Metrics and logs are in [`results/`](results/), and the
+  process record is in [`DEVLOG.md`](DEVLOG.md).
+- Untested next steps: a stronger retriever (it sets the ceiling), more reranker epochs, and the 7B
+  teacher for a fairer rationale test.
+
+To reproduce the whole run unattended, use `scripts/queue_apply3.ps1`. It downloads the data,
+waits for a free GPU, trains, evaluates, and commits the results.
+
+See [`docs/experiment-design.md`](docs/experiment-design.md) for the model and evaluation choices.
 
 The surrounding `Distill` workspace contains a separate Apply 2 project. This
 repository is nested in its own `eedi-baseline/` directory so that project is
