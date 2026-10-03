@@ -12,23 +12,42 @@ and the rationale cache is bound to its query text with a SHA-256 input hash.
 ## Results (scale B, 2026-10-03)
 
 Validation split: 859 queries from 374 held-out questions. All three conditions share the same
-retriever top-25 pools. Intervals come from a paired bootstrap over queries.
+retriever top-25 pools. Intervals are 95% paired-bootstrap intervals that resample whole questions,
+because the wrong answers to one question are correlated.
 
 | Condition | MAP@25 | Recall@25 | Δ vs. previous row (95% CI) |
 |---|---:|---:|---|
 | Retriever (bge-small-en-v1.5, 2 epochs) | 0.2309 | 0.6903 | — |
-| + Reranker (ms-marco-MiniLM-L-6-v2, 1 epoch) | 0.2590 | 0.6903 | +0.028 [+0.005, +0.050] |
-| + Teacher rationale (Qwen2.5-1.5B-Instruct) | 0.2636 | 0.6903 | +0.005 [−0.013, +0.022] |
+| + Reranker (ms-marco-MiniLM-L-6-v2, 1 epoch) | 0.2590 | 0.6903 | +0.028 [+0.001, +0.055] |
+| + Teacher rationale (Qwen2.5-1.5B-Instruct) | 0.2636 | 0.6903 | +0.005 [−0.014, +0.025] |
 
-- Reranking reliably improves on retrieval. The rationale-distillation lift is not distinguishable
-  from zero at this scale.
-- Recall@25 is the ceiling: 31% of queries have no gold misconception in the retriever's top 25, and a
-  reranker cannot recover them.
+### Seen vs. unseen misconceptions
+
+246 validation queries (29%) need a misconception that never appears in the training split.
+
+| Queries | n | Retriever | + Reranker | + Rationale | Reranker vs retriever | Rationale vs reranker |
+|---|---:|---:|---:|---:|---|---|
+| Seen in training | 613 | 0.234 | 0.296 | 0.290 | +0.062 [+0.028, +0.096] | −0.006 [−0.030, +0.018] |
+| Never seen | 246 | 0.222 | 0.167 | 0.198 | −0.056 [−0.099, −0.012] | +0.031 [−0.003, +0.067] |
+
+- Reranking reliably improves on retrieval overall, but only because it learns the training
+  misconceptions: it helps on seen ones and **hurts on unseen ones**.
+- The rationale lift is not distinguishable from zero overall. On unseen misconceptions it wins back
+  about half the reranker's loss, with an interval that just touches zero. That is the most promising
+  signal for a stronger (7B) teacher, not an established effect.
+- Recall@25 is the ceiling: for 266 queries (31%) the gold misconception is not in the retriever's top
+  25, and a reranker cannot recover them. The gold ranks first for 93 / 124 / 122 queries
+  (retriever / reranker / rationale).
 - The teacher was scaled down from the brief's Qwen2.5-7B to fit a 6 h budget on an 8 GiB RTX 4060
-  Laptop GPU. The full run took 0.46 GPU hours. Metrics and logs are in [`results/`](results/), and the
-  process record is in [`DEVLOG.md`](DEVLOG.md).
-- Untested next steps: a stronger retriever (it sets the ceiling), more reranker epochs, and the 7B
-  teacher for a fairer rationale test.
+  Laptop GPU. The full run took 0.46 GPU hours.
+
+Details are in [`results/`](results/): `metrics.json`, `analysis.json` (rank bins, recall curve,
+seen/unseen, per-query wins and losses, topics, example rationales), and `report.html`, a
+self-contained page of charts. Recompute the analysis with `python -m scripts.analyze_results`.
+[`DEVLOG.md`](DEVLOG.md) is the process record.
+
+Untested next steps: a stronger retriever (it sets the ceiling), more reranker epochs, and the 7B
+teacher, judged on unseen misconceptions in particular.
 
 To reproduce the whole run unattended, use `scripts/queue_apply3.ps1`. It downloads the data,
 waits for a free GPU, trains, evaluates, and commits the results.

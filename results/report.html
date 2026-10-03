@@ -1,0 +1,510 @@
+<title>Eedi Misconception Ranking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column on an exercise-book grid; each finding is a figure with its own caption. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #14181f;
+  --ink-2: #4a5160;
+  --ink-3: #7a8191;
+  --rule: #dde1e8;
+  --grid: #e9ecf1;
+  --s1: #2a78d6;  /* retriever */
+  --s2: #eb6834;  /* + reranker */
+  --s3: #1baf7a;  /* + rationale */
+  --win: #2a78d6;
+  --loss: #e34948;
+  --neutral: #d6d9df;
+  --o1: #104281; --o2: #256abf; --o3: #5598e7; --o4: #86b6ef;
+  --f-display: "Schibsted Grotesk", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151a; --surface: #1a1e25; --ink: #f1f3f6; --ink-2: #b9bfcb; --ink-3: #8a91a0;
+    --rule: #2c323c; --grid: #222831;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --win: #3987e5; --loss: #e66767; --neutral: #3a3f48;
+    --o1: #cde2fb; --o2: #86b6ef; --o3: #3987e5; --o4: #1c5cab;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151a; --surface: #1a1e25; --ink: #f1f3f6; --ink-2: #b9bfcb; --ink-3: #8a91a0;
+  --rule: #2c323c; --grid: #222831;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --win: #3987e5; --loss: #e66767; --neutral: #3a3f48;
+  --o1: #cde2fb; --o2: #86b6ef; --o3: #3987e5; --o4: #1c5cab;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--f-body); }
+.wrap { max-width: 920px; margin: 0 auto; padding-inline: 20px; padding-block: 32px 64px; }
+header.top {
+  padding-block: 28px 24px; margin-bottom: 8px;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px; background-position: -1px -1px;
+  border-bottom: 2px solid var(--ink);
+}
+.eyebrow { font: 500 12px/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+h1 { font: 800 clamp(30px, 5vw, 46px)/1.08 var(--f-display); letter-spacing: -.02em; margin: 10px 0 12px; text-wrap: balance; }
+h2 { font: 700 22px/1.25 var(--f-display); margin: 0 0 6px; text-wrap: balance; }
+h3 { font: 700 16px/1.3 var(--f-display); margin: 0; }
+.lede { max-width: 66ch; color: var(--ink-2); font-size: 17px; margin: 0; }
+.lede b { color: var(--ink); }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-block: 24px 8px; }
+.tile { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; min-width: 0; }
+.tile .k { font: 500 12px/1.3 var(--f-mono); color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+.tile .v { font: 700 30px/1.1 var(--f-display); font-variant-numeric: tabular-nums; margin-top: 6px; }
+.tile .d { font: 400 13px/1.35 var(--f-mono); color: var(--ink-3); margin-top: 4px; }
+.sw { width: 10px; height: 10px; border-radius: 2px; flex: none; display: inline-block; }
+section.fig { margin-top: 44px; }
+.cap { color: var(--ink-2); max-width: 70ch; margin: 0 0 14px; }
+.chart { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 14px 10px; position: relative; min-width: 0; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 400 13px/1.4 var(--f-mono); color: var(--ink-2); margin: 0 0 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.note { font-size: 14px; color: var(--ink-3); margin-top: 10px; max-width: 70ch; }
+.callout { border-left: 3px solid var(--ink); padding: 4px 0 4px 14px; margin: 14px 0 0; max-width: 70ch; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+svg text { font-family: var(--f-mono); }
+.axis text { fill: var(--ink-3); font-size: 11px; }
+.axis line, .axis path { stroke: var(--rule); }
+.gridl { stroke: var(--grid); }
+.lbl { fill: var(--ink-2); font-size: 12px; }
+.lbl-strong { fill: var(--ink); font-size: 12px; font-weight: 500; }
+.hit { fill: transparent; cursor: default; }
+#tip { position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: var(--bg); font: 12px/1.45 var(--f-mono); padding: 7px 9px; border-radius: 4px; max-width: 260px; opacity: 0; transition: opacity .08s; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 12px/1.3 var(--f-mono); color: var(--ink-2); text-transform: uppercase; letter-spacing: .05em; }
+td.num, th.num { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.tablewrap { overflow-x: auto; }
+.examples { display: grid; gap: 12px; }
+.ex { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; min-width: 0; }
+.ex .q { font-size: 15px; margin: 6px 0 8px; }
+.ex dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: 14px; }
+.ex dt { font: 500 12px/1.6 var(--f-mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; }
+.ex dd { margin: 0; }
+.ranks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.pill { font: 500 12px/1 var(--f-mono); border: 1px solid var(--rule); border-radius: 999px; padding: 5px 9px; display: inline-flex; align-items: center; gap: 6px; }
+.tag { font: 500 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 7px; border-radius: 3px; }
+.tag.up { background: color-mix(in srgb, var(--s3) 18%, transparent); color: var(--ink); }
+.tag.down { background: color-mix(in srgb, var(--loss) 18%, transparent); color: var(--ink); }
+.sub { margin: 28px 0 10px; }
+footer { margin-top: 52px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--ink-3); font-size: 14px; }
+@media (max-width: 720px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { #tip { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Apply 3 · Eedi “Mining Misconceptions in Mathematics” · validation split</div>
+    <h1>Reranking helps. The teacher’s rationale does not, yet.</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section class="fig" id="gains">
+    <h2>How much each stage adds</h2>
+    <p class="cap">Change in MAP@25 with 95% intervals from a paired bootstrap that resamples whole questions, since the wrong answers to one question are related. An interval that crosses zero is not a reliable gain.</p>
+    <div class="chart"><div id="c-forest"></div></div>
+  </section>
+
+  <section class="fig">
+    <h2>Recall at every cutoff</h2>
+    <p class="cap">Share of queries whose correct misconception appears in the top <i>k</i>. All three curves end at the same point: the rerankers only reorder the retriever’s 25 candidates, so the right-hand end is fixed by the retriever.</p>
+    <div class="chart">
+      <div class="legend" id="lg-recall"></div>
+      <div id="c-recall"></div>
+    </div>
+  </section>
+
+  <section class="fig">
+    <h2>Where the correct misconception lands</h2>
+    <p class="cap">Every validation query, binned by the rank of its correct misconception. Reranking mostly moves answers into first place; the grey “not in top 25” block cannot change.</p>
+    <div class="chart">
+      <div class="legend" id="lg-ranks"></div>
+      <div id="c-ranks"></div>
+    </div>
+  </section>
+
+  <section class="fig">
+    <h2>Seen and unseen misconceptions</h2>
+    <p class="cap" id="cap-seen"></p>
+    <div class="two">
+      <div class="chart">
+        <div class="legend" id="lg-seen"></div>
+        <div id="c-seen"></div>
+      </div>
+      <div class="chart"><div id="c-seen-forest"></div></div>
+    </div>
+    <p class="callout" id="seen-callout"></p>
+  </section>
+
+  <section class="fig">
+    <h2>Query by query</h2>
+    <p class="cap">For each query, did the later stage rank the correct misconception higher, lower, or the same? A mean gain can hide many swaps in both directions.</p>
+    <div class="chart">
+      <div class="legend" id="lg-wl"></div>
+      <div id="c-wl"></div>
+    </div>
+  </section>
+
+  <section class="fig">
+    <h2>By maths topic</h2>
+    <p class="cap" id="cap-subj"></p>
+    <div class="chart">
+      <div class="legend" id="lg-subj"></div>
+      <div id="c-subj"></div>
+    </div>
+  </section>
+
+  <section class="fig">
+    <h2>What the teacher wrote</h2>
+    <p class="cap" id="cap-ex"></p>
+    <h3 class="sub">Rationale moved the answer up</h3>
+    <div class="examples" id="ex-up"></div>
+    <h3 class="sub">Rationale moved the answer down</h3>
+    <div class="examples" id="ex-down"></div>
+  </section>
+
+  <section class="fig">
+    <h2>Run details</h2>
+    <p class="cap">Scale B on one RTX 4060 Laptop GPU (8 GiB), run unattended by the queue after the other projects freed the GPU.</p>
+    <div class="chart"><div id="c-time"></div></div>
+    <div class="tablewrap" style="margin-top:14px">
+      <table id="t-setup"></table>
+    </div>
+  </section>
+
+  <footer>Source: <span style="font-family:var(--f-mono)">Khawpuneiei/Eedi-baseline-Distill-LLM</span>, results/ and DEVLOG.md. Metrics computed from saved per-query predictions; intervals use 2,000 bootstrap resamples.</footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const D = {"map": {"rationale": 0.26357149285654086, "reranker": 0.25904875741367445, "retriever": 0.2309433648861515}, "recall25": 0.6903376018626309, "n": 859, "nq": 374, "train_n": 3511, "catalog": 2587, "train_misc": 1413, "val_misc": 540, "recall_curve": {"retriever": [0.10826542491268917, 0.20139697322467986, 0.2689173457508731, 0.3213038416763679, 0.37485448195576254, 0.4109429569266589, 0.4412107101280559, 0.46449359720605354, 0.4889406286379511, 0.5122235157159488, 0.5308498253783469, 0.5518044237485448, 0.5692665890570431, 0.5797438882421421, 0.5972060535506403, 0.6146682188591386, 0.6274738067520372, 0.6367869615832363, 0.6426076833527358, 0.6495925494761351, 0.6577415599534342, 0.6647264260768335, 0.6775320139697323, 0.6880093131548312, 0.6903376018626309], "reranker": [0.14435389988358557, 0.2351571594877765, 0.2991850989522701, 0.3480791618160652, 0.3841676367869616, 0.420256111757858, 0.43888242142025613, 0.4575087310826543, 0.48661233993015135, 0.5040745052386496, 0.529685681024447, 0.5459837019790454, 0.5715948777648429, 0.5960419091967404, 0.610011641443539, 0.6239813736903376, 0.6367869615832363, 0.6449359720605355, 0.6530849825378346, 0.6589057043073341, 0.6670547147846333, 0.6775320139697323, 0.6798603026775321, 0.6845168800931315, 0.6903376018626309], "rationale": [0.1420256111757858, 0.25261932479627475, 0.3131548311990687, 0.3492433061699651, 0.3946449359720605, 0.42840512223515714, 0.459837019790454, 0.4807916181606519, 0.5052386495925495, 0.5227008149010477, 0.5436554132712457, 0.5611175785797439, 0.5774155995343423, 0.5867287543655413, 0.59953434225844, 0.6053550640279395, 0.6204889406286379, 0.6332945285215367, 0.6391152502910361, 0.6542491268917345, 0.6647264260768335, 0.6728754365541327, 0.6821885913853318, 0.6868451688009313, 0.6903376018626309]}, "rank_bins": {"retriever": {"1": 93, "2–5": 229, "6–10": 118, "11–25": 153, "miss": 266}, "reranker": {"1": 124, "2–5": 206, "6–10": 103, "11–25": 160, "miss": 266}, "rationale": {"1": 122, "2–5": 217, "6–10": 110, "11–25": 144, "miss": 266}}, "wl": {"reranker_vs_retriever": {"win": 277, "loss": 246, "tie": 336}, "rationale_vs_reranker": {"win": 228, "loss": 235, "tie": 396}}, "seen": {"seen": {"n": 613, "retriever": {"map": 0.23434064123553333, "recall": 0.6949429037520392}, "reranker": {"map": 0.2959803363471559, "recall": 0.6949429037520392}, "rationale": {"map": 0.28986006067167813, "recall": 0.6949429037520392}}, "unseen": {"n": 246, "retriever": {"map": 0.22247779414561972, "recall": 0.6788617886178862}, "reranker": {"map": 0.1670200668192676, "recall": 0.6788617886178862}, "rationale": {"map": 0.19806380151231764, "recall": 0.6788617886178862}}}, "subjects": [{"subject": "Linear Equations", "n": 29, "retriever": 0.2549808429118774, "reranker": 0.2792990836548005, "rationale": 0.2659036028204385}, {"subject": "Writing Expressions", "n": 28, "retriever": 0.3179171668667467, "reranker": 0.39750900360144054, "rationale": 0.28393630179344465}, {"subject": "Mental Multiplication and Division", "n": 23, "retriever": 0.14978545923725506, "reranker": 0.10477593852879893, "rationale": 0.236941454705271}, {"subject": "Linear Sequences (nth term)", "n": 22, "retriever": 0.252729908979909, "reranker": 0.17191427853192556, "rationale": 0.18645817292062353}, {"subject": "BIDMAS", "n": 21, "retriever": 0.3074143087186566, "reranker": 0.2890371533228676, "rationale": 0.26566515495086923}, {"subject": "Quadratic Equations", "n": 18, "retriever": 0.18711419753086422, "reranker": 0.2266093474426808, "rationale": 0.22780182780182778}, {"subject": "Types, Naming and Estimating", "n": 17, "retriever": 0.3349587203302373, "reranker": 0.43339381207028266, "rationale": 0.32981166150670793}, {"subject": "Properties of Quadrilaterals", "n": 17, "retriever": 0.4715940921823275, "reranker": 0.39612511671335204, "rationale": 0.3667366946778712}], "n_subjects": 124, "ci": {"all": {"reranker-retriever": [0.0281053925275227, 0.0014138538481841096, 0.05446103856821533], "rationale-reranker": [0.0045227354428666626, -0.013971106272990521, 0.02485102338263137], "rationale-retriever": [0.032628127970389366, 0.004600535965560309, 0.061064999158806164]}, "seen": {"reranker-retriever": [0.061639695111622546, 0.027718982357116787, 0.09580349850059508], "rationale-reranker": [-0.006120275675477645, -0.030101053581994604, 0.018018448694515465], "rationale-retriever": [0.05551941943614485, 0.02235076753534576, 0.08860411757533612]}, "unseen": {"reranker-retriever": [-0.05545772732635192, -0.09897439404202639, -0.01185039514684431], "rationale-reranker": [0.031043734693049843, -0.003074380947423794, 0.06690627178968413], "rationale-retriever": [-0.024413992633302073, -0.06848263105005954, 0.01890521893327721]}}, "examples": {"rationale_helped": [{"qid": "1724_D", "rationale": "The distractor suggests that the \"4\" represents thousands rather than hundreds, leading to an incorrect interpretation of its place value.", "ranks": {"retriever": 4, "reranker": 16, "rationale": 1}}, {"qid": "1724_B", "rationale": "The distractor suggests that the \"4\" represents hundreds rather than tens, leading to an incorrect interpretation of its place value.", "ranks": {"retriever": 12, "reranker": 14, "rationale": 1}}, {"qid": "1743_D", "rationale": "The distractor assumes that both increases should be applied sequentially without considering the compounded effect on the total amount.", "ranks": {"retriever": 3, "reranker": 12, "rationale": 1}}], "rationale_hurt": [{"qid": "69_C", "rationale": "The reasoning error is assuming that because both towns have the same number of respondents (50), their data should be equally reliable without considering other factors like sample size or population size differences.", "ranks": {"retriever": 22, "reranker": 1, "rationale": 20}}, {"qid": "1743_C", "rationale": "The distractor suggests increasing first by 60%, then by another 10% on the increased amount, which is incorrect because you should always apply the final percentage to the most recent value after all previous increases.", "ranks": {"retriever": 5, "reranker": 1, "rationale": 9}}]}, "steps": [["Train retriever", 89], ["Train reranker", 452], ["Evaluate baseline", 29], ["Rationales, train", 397], ["Rationales, validation", 94], ["Train rationale reranker", 528], ["Evaluate all", 52]], "rat_len": 23.3};
+const C = ["retriever", "reranker", "rationale"];
+const NAME = { retriever: "Retriever", reranker: "+ Reranker", rationale: "+ Rationale" };
+const VAR = { retriever: "--s1", reranker: "--s2", rationale: "--s3" };
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt = (x, d = 3) => x.toFixed(d);
+const pct = x => (100 * x).toFixed(1) + "%";
+const sgn = (x, d = 3) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(d);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(parent, x, y, s, cls = "lbl", anchor = "start", extra = {}) {
+  const t = el("text", { x, y, class: cls, "text-anchor": anchor, ...extra }, parent);
+  t.textContent = s; return t;
+}
+const tip = document.getElementById("tip");
+function bindTip(node, html) {
+  node.addEventListener("mousemove", e => {
+    tip.innerHTML = html; tip.style.opacity = 1;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = e.clientX + 14, y = e.clientY + 14;
+    if (x + w > innerWidth - 8) x = e.clientX - w - 14;
+    if (y + h > innerHeight - 8) y = e.clientY - h - 14;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  });
+  node.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+}
+function legend(id, items) {
+  const box = document.getElementById(id); box.innerHTML = "";
+  for (const [label, v] of items) {
+    const s = document.createElement("span");
+    s.innerHTML = `<i class="sw" style="background:var(${v})"></i>`;
+    s.append(label); box.appendChild(s);
+  }
+}
+function svgFor(id, h) {
+  const host = document.getElementById(id); host.innerHTML = "";
+  const w = Math.max(280, host.clientWidth);
+  const svg = el("svg", { viewBox: `0 0 ${w} ${h}`, width: w, height: h }, host);
+  return [svg, w];
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ---------- text
+function renderText() {
+  const m = D.map;
+  document.getElementById("lede").innerHTML =
+    `A small retriever finds 25 candidate misconceptions for each wrong answer, a cross-encoder reorders them, and a third model also reads a one-line teacher explanation of the student’s error. On <b>${D.n} held-out queries</b> from ${D.nq} questions, reranking lifts MAP@25 from <b>${fmt(m.retriever)}</b> to <b>${fmt(m.reranker)}</b>. Adding the rationale gives <b>${fmt(m.rationale)}</b>, a change too small to tell from noise.`;
+  const tiles = [
+    ["retriever", "Retriever", m.retriever, "bge-small, top 25 of " + D.catalog.toLocaleString()],
+    ["reranker", "+ Reranker", m.reranker, sgn(m.reranker - m.retriever) + " vs retriever"],
+    ["rationale", "+ Rationale", m.rationale, sgn(m.rationale - m.reranker) + " vs reranker"],
+  ];
+  const box = document.getElementById("tiles");
+  box.innerHTML = tiles.map(([c, k, v, d]) =>
+    `<div class="tile"><div class="k"><i class="sw" style="background:var(${VAR[c]})"></i>${k} · MAP@25</div><div class="v">${fmt(v)}</div><div class="d">${d}</div></div>`).join("") +
+    `<div class="tile"><div class="k">Recall@25 ceiling</div><div class="v">${pct(D.recall25)}</div><div class="d">${pct(1 - D.recall25)} of queries unreachable</div></div>`;
+  const s = D.seen;
+  document.getElementById("cap-seen").textContent =
+    `${s.unseen.n} of ${D.n} validation queries (${pct(s.unseen.n / D.n)}) need a misconception that never appears in the training split. Training covers ${D.train_misc.toLocaleString()} of the ${D.catalog.toLocaleString()} misconceptions in the catalog.`;
+  const ci = D.ci;
+  document.getElementById("seen-callout").innerHTML =
+    `The reranker learned the training misconceptions: it gains <b>${sgn(ci.seen["reranker-retriever"][0])}</b> on seen ones but loses <b>${sgn(ci.unseen["reranker-retriever"][0])}</b> on unseen ones, both outside zero. The rationale recovers <b>${sgn(ci.unseen["rationale-reranker"][0])}</b> of that loss on unseen misconceptions, but its interval [${sgn(ci.unseen["rationale-reranker"][1])}, ${sgn(ci.unseen["rationale-reranker"][2])}] still touches zero. This is the most promising signal for the 7B-teacher follow-up, not a result yet.`;
+  document.getElementById("cap-subj").textContent =
+    `MAP@25 for the eight largest of ${D.n_subjects} topics in the validation split. Each topic has only 17–29 queries, so read these as a rough picture of where the system struggles, not as reliable differences.`;
+  document.getElementById("cap-ex").textContent =
+    `Qwen2.5-1.5B-Instruct saw only the question, correct answer, and wrong answer, never the label. Its sentences average ${D.rat_len} words. Ranks below are the position of the correct misconception, out of 25; “—” means it was not retrieved.`;
+}
+
+// ---------- forest plot of gains
+function forest(id, rows, opts = {}) {
+  const rowH = 44, top = 30, bottom = 30;
+  const h = top + rows.length * rowH + bottom;
+  const [svg, w] = svgFor(id, h);
+  const labelW = Math.min(230, Math.max(w * 0.42, 162)), right = 56;
+  const lo = opts.lo ?? -0.12, hi = opts.hi ?? 0.12;
+  const x = v => labelW + (v - lo) / (hi - lo) * (w - labelW - right);
+  const ticks = opts.ticks ?? [-0.1, -0.05, 0, 0.05, 0.1];
+  const ax = el("g", { class: "axis" }, svg);
+  for (const t of ticks) {
+    el("line", { x1: x(t), x2: x(t), y1: top - 8, y2: h - bottom + 4, class: "gridl", "stroke-width": t === 0 ? 0 : 1 }, svg);
+    txt(ax, x(t), h - bottom + 20, (t > 0 ? "+" : t < 0 ? "−" : "") + Math.abs(t).toFixed(2), "", "middle");
+  }
+  el("line", { x1: x(0), x2: x(0), y1: top - 10, y2: h - bottom + 4, stroke: css("--ink-3"), "stroke-width": 1.5, "stroke-dasharray": "3 3" }, svg);
+  txt(svg, x(0), top - 14, "no change", "lbl", "middle", { style: "font-size:11px" });
+  rows.forEach((r, i) => {
+    const y = top + i * rowH + rowH / 2;
+    txt(svg, 0, y - 3, r.label, "lbl-strong");
+    txt(svg, 0, y + 13, r.sub, "lbl", "start", { style: "font-size:11px" });
+    const [m, a, b] = r.v;
+    const color = css(r.color);
+    el("line", { x1: x(a), x2: x(b), y1: y, y2: y, stroke: color, "stroke-width": 2, "stroke-linecap": "round" }, svg);
+    for (const e of [a, b]) el("line", { x1: x(e), x2: x(e), y1: y - 6, y2: y + 6, stroke: color, "stroke-width": 2, "stroke-linecap": "round" }, svg);
+    el("circle", { cx: x(m), cy: y, r: 6, fill: color, stroke: css("--surface"), "stroke-width": 2 }, svg);
+    txt(svg, w - right + 8, y + 4, sgn(m), "lbl-strong");
+    const hit = el("rect", { x: labelW, y: y - rowH / 2, width: w - labelW, height: rowH, class: "hit" }, svg);
+    bindTip(hit, `<b>${esc(r.label)}</b><br>ΔMAP@25 ${sgn(m, 4)}<br>95% CI [${sgn(a, 4)}, ${sgn(b, 4)}]<br>${a > 0 || b < 0 ? "Interval excludes zero" : "Interval includes zero"}`);
+  });
+}
+
+// ---------- recall curve
+function recallCurve() {
+  const h = 300, l = 46, r = 104, t = 12, b = 34;
+  const [svg, w] = svgFor("c-recall", h);
+  const x = k => l + (k - 1) / 24 * (w - l - r);
+  const y = v => t + (1 - v / 0.75) * (h - t - b);
+  const ax = el("g", { class: "axis" }, svg);
+  for (const v of [0, 0.25, 0.5, 0.75]) {
+    el("line", { x1: l, x2: w - r, y1: y(v), y2: y(v), class: "gridl" }, svg);
+    txt(ax, l - 8, y(v) + 4, (v * 100) + "%", "", "end");
+  }
+  for (const k of [1, 5, 10, 15, 20, 25]) txt(ax, x(k), h - b + 18, k, "", "middle");
+  txt(ax, (l + w - r) / 2, h - 2, "cutoff k", "", "middle");
+  for (const c of C) {
+    const pts = D.recall_curve[c].map((v, i) => `${x(i + 1)},${y(v)}`).join(" ");
+    el("polyline", { points: pts, fill: "none", stroke: css(VAR[c]), "stroke-width": 2, "stroke-linejoin": "round" }, svg);
+  }
+  const endY = y(D.recall_curve.retriever[24]);
+  txt(svg, w - r + 8, endY + 4, pct(D.recall_curve.retriever[24]) + " all", "lbl-strong");
+  // crosshair
+  const cross = el("line", { y1: t, y2: h - b, stroke: css("--ink-3"), "stroke-width": 1, opacity: 0 }, svg);
+  const dots = C.map(c => el("circle", { r: 4.5, fill: css(VAR[c]), stroke: css("--surface"), "stroke-width": 2, opacity: 0 }, svg));
+  const hit = el("rect", { x: l, y: t, width: w - l - r, height: h - t - b, class: "hit" }, svg);
+  hit.addEventListener("mousemove", e => {
+    const box = svg.getBoundingClientRect();
+    const px = (e.clientX - box.left) * (w / box.width);
+    const k = Math.min(25, Math.max(1, Math.round(1 + (px - l) / (w - l - r) * 24)));
+    cross.setAttribute("x1", x(k)); cross.setAttribute("x2", x(k)); cross.setAttribute("opacity", 1);
+    C.forEach((c, i) => { dots[i].setAttribute("cx", x(k)); dots[i].setAttribute("cy", y(D.recall_curve[c][k - 1])); dots[i].setAttribute("opacity", 1); });
+    tip.innerHTML = `<b>Top ${k}</b><br>` + C.map(c => `${NAME[c]}: ${pct(D.recall_curve[c][k - 1])}`).join("<br>");
+    tip.style.opacity = 1;
+    const tw = tip.offsetWidth;
+    tip.style.left = (e.clientX + 14 + tw > innerWidth ? e.clientX - tw - 14 : e.clientX + 14) + "px";
+    tip.style.top = (e.clientY + 14) + "px";
+  });
+  hit.addEventListener("mouseleave", () => { tip.style.opacity = 0; cross.setAttribute("opacity", 0); dots.forEach(d => d.setAttribute("opacity", 0)); });
+  legend("lg-recall", C.map(c => [`${NAME[c]} · top-1 ${pct(D.recall_curve[c][0])}`, VAR[c]]));
+}
+
+// ---------- rank bins (100% stacked)
+function rankBins() {
+  const bins = ["1", "2–5", "6–10", "11–25", "miss"];
+  const binName = { "1": "Rank 1", "2–5": "Rank 2–5", "6–10": "Rank 6–10", "11–25": "Rank 11–25", "miss": "Not in top 25" };
+  const bVar = { "1": "--o1", "2–5": "--o2", "6–10": "--o3", "11–25": "--o4", "miss": "--neutral" };
+  const rowH = 40, t = 6, h = t + C.length * rowH + 6;
+  const [svg, w] = svgFor("c-ranks", h);
+  const l = Math.min(120, w * 0.3), r = 8;
+  const sx = v => v / D.n * (w - l - r);
+  C.forEach((c, i) => {
+    const y = t + i * rowH + 6;
+    txt(svg, 0, y + 18, NAME[c], "lbl-strong");
+    let x0 = l;
+    bins.forEach(bn => {
+      const n = D.rank_bins[c][bn];
+      const bw = Math.max(0, sx(n) - 2);
+      const rect = el("rect", { x: x0, y, width: bw, height: 26, fill: css(bVar[bn]), rx: 2 }, svg);
+      if (bw > 40) txt(svg, x0 + bw / 2, y + 17, n, "", "middle", { style: `font-size:11px;fill:${bn === "1" || bn === "2–5" ? css("--surface") : css("--ink")}` });
+      bindTip(rect, `<b>${NAME[c]}</b><br>${binName[bn]}: ${n} queries (${pct(n / D.n)})`);
+      x0 += sx(n);
+    });
+  });
+  legend("lg-ranks", bins.map(bn => [binName[bn], bVar[bn]]));
+}
+
+// ---------- grouped bars seen/unseen
+function seenBars() {
+  const groups = [["seen", "Seen in training"], ["unseen", "Never seen"]];
+  const h = 260, l = 40, r = 8, t = 18, b = 40;
+  const [svg, w] = svgFor("c-seen", h);
+  const y = v => t + (1 - v / 0.35) * (h - t - b);
+  const ax = el("g", { class: "axis" }, svg);
+  for (const v of [0, 0.1, 0.2, 0.3]) {
+    el("line", { x1: l, x2: w - r, y1: y(v), y2: y(v), class: "gridl" }, svg);
+    txt(ax, l - 6, y(v) + 4, v.toFixed(1), "", "end");
+  }
+  const gw = (w - l - r) / 2, bw = Math.min(40, (gw - 40) / 3);
+  groups.forEach(([g, label], gi) => {
+    const cx = l + gw * gi + gw / 2;
+    C.forEach((c, i) => {
+      const v = D.seen[g][c].map;
+      const x = cx + (i - 1.5) * (bw + 2);
+      const rect = el("rect", { x, y: y(v), width: bw, height: y(0) - y(v), fill: css(VAR[c]), rx: 2 }, svg);
+      txt(svg, x + bw / 2, y(v) - 5, v.toFixed(2), "lbl", "middle", { style: "font-size:11px" });
+      bindTip(rect, `<b>${label}</b> (${D.seen[g].n} queries)<br>${NAME[c]}: MAP@25 ${fmt(v)}`);
+    });
+    txt(svg, cx, h - b + 18, label, "lbl-strong", "middle");
+    txt(svg, cx, h - b + 33, D.seen[g].n + " queries", "lbl", "middle", { style: "font-size:11px" });
+  });
+  legend("lg-seen", C.map(c => [NAME[c], VAR[c]]));
+}
+
+// ---------- win/loss diverging
+function winLoss() {
+  const rows = [["reranker_vs_retriever", "Reranker vs retriever"], ["rationale_vs_reranker", "Rationale vs reranker"]];
+  const rowH = 46, t = 6, h = t + rows.length * rowH + 26;
+  const [svg, w] = svgFor("c-wl", h);
+  const l = Math.min(170, Math.max(w * 0.36, 162)), r = 8;
+  const sx = v => v / D.n * (w - l - r);
+  rows.forEach(([k, label], i) => {
+    const y = t + i * rowH + 6, d = D.wl[k];
+    txt(svg, 0, y + 18, label, "lbl-strong");
+    let x0 = l;
+    for (const [part, v, name] of [["win", "--win", "Ranked higher"], ["tie", "--neutral", "Same rank"], ["loss", "--loss", "Ranked lower"]]) {
+      const bw = Math.max(0, sx(d[part]) - 2);
+      const rect = el("rect", { x: x0, y, width: bw, height: 26, fill: css(v), rx: 2 }, svg);
+      if (bw > 34) txt(svg, x0 + bw / 2, y + 17, d[part], "", "middle", { style: `font-size:11px;fill:${part === "tie" ? css("--ink") : css("--surface")}` });
+      bindTip(rect, `<b>${label}</b><br>${name}: ${d[part]} queries (${pct(d[part] / D.n)})`);
+      x0 += sx(d[part]);
+    }
+  });
+  txt(svg, l, h - 6, "Same-rank queries include the 266 that neither model can reach.", "lbl", "start", { style: "font-size:11px" });
+  legend("lg-wl", [["Later stage ranked it higher", "--win"], ["Same rank", "--neutral"], ["Later stage ranked it lower", "--loss"]]);
+}
+
+// ---------- subjects dot plot
+function subjects() {
+  const rows = D.subjects, rowH = 32, t = 24, b = 6;
+  const h = t + rows.length * rowH + b;
+  const [svg, w] = svgFor("c-subj", h);
+  const l = Math.min(250, w * 0.46), r = 14;
+  const x = v => l + v / 0.5 * (w - l - r);
+  const ax = el("g", { class: "axis" }, svg);
+  for (const v of [0, 0.1, 0.2, 0.3, 0.4, 0.5]) {
+    el("line", { x1: x(v), x2: x(v), y1: t - 6, y2: h - b, class: "gridl" }, svg);
+    txt(ax, x(v), t - 10, v.toFixed(1), "", "middle");
+  }
+  rows.forEach((s, i) => {
+    const y = t + i * rowH + rowH / 2;
+    const maxCh = Math.floor((l - 52) / 7.3);
+    const name = s.subject.length > maxCh ? s.subject.slice(0, maxCh - 1) + "…" : s.subject;
+    txt(svg, 0, y + 4, name, "lbl-strong");
+    txt(svg, l - 10, y + 4, "n=" + s.n, "lbl", "end", { style: "font-size:11px" });
+    const vals = C.map(c => s[c]);
+    el("line", { x1: x(Math.min(...vals)), x2: x(Math.max(...vals)), y1: y, y2: y, stroke: css("--rule"), "stroke-width": 2 }, svg);
+    C.forEach(c => {
+      const dot = el("circle", { cx: x(s[c]), cy: y, r: 6, fill: css(VAR[c]), stroke: css("--surface"), "stroke-width": 2 }, svg);
+      bindTip(dot, `<b>${esc(s.subject)}</b> (${s.n} queries)<br>${NAME[c]}: MAP@25 ${fmt(s[c])}`);
+    });
+    const hit = el("rect", { x: 0, y: y - rowH / 2, width: l - 4, height: rowH, class: "hit" }, svg);
+    bindTip(hit, `<b>${esc(s.subject)}</b> (${s.n} queries)<br>` + C.map(c => `${NAME[c]}: ${fmt(s[c])}`).join("<br>"));
+  });
+  legend("lg-subj", C.map(c => [NAME[c], VAR[c]]));
+}
+
+// ---------- examples
+function examples() {
+  const card = (e, up) => {
+    const r = c => e.ranks[c] ?? "—";
+    return `<article class="ex">
+      <span class="tag ${up ? "up" : "down"}">${up ? "rationale helped" : "rationale hurt"}</span>
+      ${e.question
+        ? `<p class="q">${esc(e.question)}${e.question.length >= 220 ? "…" : ""}</p>
+      <dl>
+        <dt>Correct</dt><dd>${esc(e.correct)}</dd>
+        <dt>Student</dt><dd>${esc(e.distractor)}</dd>
+        <dt>Label</dt><dd>${esc(e.gold)}</dd>
+        <dt>Teacher</dt><dd><i>${esc(e.rationale)}</i></dd>
+      </dl>`
+        : `<p class="q">Query <span style="font-family:var(--f-mono)">${esc(e.qid)}</span> (question text omitted; see data/processed/validation.jsonl locally)</p>
+      <dl><dt>Teacher</dt><dd><i>${esc(e.rationale)}</i></dd></dl>`}
+      <div class="ranks">${C.map(c => `<span class="pill"><i class="sw" style="background:var(${VAR[c]})"></i>${NAME[c]}: ${r(c)}</span>`).join("")}</div>
+    </article>`;
+  };
+  document.getElementById("ex-up").innerHTML = D.examples.rationale_helped.map(e => card(e, true)).join("");
+  document.getElementById("ex-down").innerHTML = D.examples.rationale_hurt.map(e => card(e, false)).join("");
+}
+
+// ---------- timing bar + setup table
+function timing() {
+  const total = D.steps.reduce((s, [, v]) => s + v, 0);
+  const h = 74;
+  const [svg, w] = svgFor("c-time", h);
+  const sx = v => v / total * w;
+  const shade = ["--o1", "--o2", "--o3", "--o4", "--o3", "--o2", "--o1"];
+  let x0 = 0;
+  D.steps.forEach(([name, s], i) => {
+    const bw = Math.max(0, sx(s) - 2);
+    const rect = el("rect", { x: x0, y: 22, width: bw, height: 24, fill: css(shade[i]), rx: 2 }, svg);
+    bindTip(rect, `<b>${esc(name)}</b><br>${Math.round(s / 6) / 10} min (${pct(s / total)} of run)`);
+    if (bw > 70) txt(svg, x0 + 4, 64, name.replace("Rationales, ", "Rat. ").replace("Train ", ""), "lbl", "start", { style: "font-size:10px" });
+    x0 += sx(s);
+  });
+  txt(svg, 0, 14, `Total ${Math.round(total / 60)} minutes of GPU time (budget: 6 hours)`, "lbl-strong");
+  const rows = [
+    ["Data", `${D.train_n.toLocaleString()} train / ${D.n} validation queries, grouped by question (seed 42)`],
+    ["Catalog", `${D.catalog.toLocaleString()} misconceptions; ${D.train_misc.toLocaleString()} appear in train, ${D.val_misc} in validation`],
+    ["Retriever", "BAAI/bge-small-en-v1.5, in-batch contrastive, 2 epochs, batch 32, max 256 tokens"],
+    ["Reranker", "cross-encoder/ms-marco-MiniLM-L-6-v2 on the retriever’s top-25 pools, 1 epoch, batch 32"],
+    ["Teacher", "Qwen2.5-1.5B-Instruct, label-blind prompt, greedy, ≤48 new tokens (brief: 7B, scaled down for time)"],
+    ["Metric", "MAP@25 (primary) and Recall@25; one gold misconception per query"],
+  ];
+  document.getElementById("t-setup").innerHTML = "<tbody>" + rows.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${v}</td></tr>`).join("") + "</tbody>";
+}
+
+function renderCharts() {
+  const ci = D.ci.all;
+  forest("c-forest", [
+    { label: "Reranker vs retriever", sub: "reorder the top 25", v: ci["reranker-retriever"], color: "--s2" },
+    { label: "Rationale vs reranker", sub: "add the teacher sentence", v: ci["rationale-reranker"], color: "--s3" },
+    { label: "Rationale vs retriever", sub: "whole pipeline", v: ci["rationale-retriever"], color: "--s3" },
+  ], { lo: -0.04, hi: 0.08, ticks: [-0.04, -0.02, 0, 0.02, 0.04, 0.06, 0.08] });
+  recallCurve(); rankBins(); seenBars();
+  forest("c-seen-forest", [
+    { label: "Seen: reranker", sub: "vs retriever", v: D.ci.seen["reranker-retriever"], color: "--s2" },
+    { label: "Seen: rationale", sub: "vs reranker", v: D.ci.seen["rationale-reranker"], color: "--s3" },
+    { label: "Unseen: reranker", sub: "vs retriever", v: D.ci.unseen["reranker-retriever"], color: "--s2" },
+    { label: "Unseen: rationale", sub: "vs reranker", v: D.ci.unseen["rationale-reranker"], color: "--s3" },
+  ], { lo: -0.12, hi: 0.12, ticks: [-0.1, -0.05, 0, 0.05, 0.1] });
+  winLoss(); subjects(); timing();
+}
+
+renderText(); examples(); renderCharts();
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderCharts, 120); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderCharts);
+new MutationObserver(renderCharts).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>

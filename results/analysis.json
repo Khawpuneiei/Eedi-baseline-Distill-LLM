@@ -1,0 +1,369 @@
+{
+  "k": 25,
+  "queries": 859,
+  "questions": 374,
+  "train_unique_misconceptions": 1413,
+  "validation_unique_misconceptions": 540,
+  "bootstrap": {
+    "unit": "question",
+    "resamples": 2000,
+    "seed": 1
+  },
+  "groups": {
+    "all": {
+      "queries": 859,
+      "map_at_k": {
+        "retriever": 0.23094336488615153,
+        "reranker": 0.2590487574136743,
+        "rationale": 0.2635714928565409
+      },
+      "recall_at_k": {
+        "retriever": 0.6903376018626309,
+        "reranker": 0.6903376018626309,
+        "rationale": 0.6903376018626309
+      },
+      "deltas": {
+        "reranker-retriever": {
+          "mean": 0.0281053925275227,
+          "ci95": [
+            0.0014138538481841096,
+            0.05446103856821533
+          ],
+          "questions": 374,
+          "queries": 859
+        },
+        "rationale-reranker": {
+          "mean": 0.0045227354428666626,
+          "ci95": [
+            -0.013971106272990521,
+            0.02485102338263137
+          ],
+          "questions": 374,
+          "queries": 859
+        },
+        "rationale-retriever": {
+          "mean": 0.032628127970389366,
+          "ci95": [
+            0.004600535965560309,
+            0.061064999158806164
+          ],
+          "questions": 374,
+          "queries": 859
+        }
+      }
+    },
+    "seen": {
+      "queries": 613,
+      "map_at_k": {
+        "retriever": 0.23434064123553333,
+        "reranker": 0.2959803363471559,
+        "rationale": 0.28986006067167813
+      },
+      "recall_at_k": {
+        "retriever": 0.6949429037520392,
+        "reranker": 0.6949429037520392,
+        "rationale": 0.6949429037520392
+      },
+      "deltas": {
+        "reranker-retriever": {
+          "mean": 0.061639695111622546,
+          "ci95": [
+            0.027718982357116787,
+            0.09580349850059508
+          ],
+          "questions": 319,
+          "queries": 613
+        },
+        "rationale-reranker": {
+          "mean": -0.006120275675477645,
+          "ci95": [
+            -0.030101053581994604,
+            0.018018448694515465
+          ],
+          "questions": 319,
+          "queries": 613
+        },
+        "rationale-retriever": {
+          "mean": 0.05551941943614485,
+          "ci95": [
+            0.02235076753534576,
+            0.08860411757533612
+          ],
+          "questions": 319,
+          "queries": 613
+        }
+      }
+    },
+    "unseen": {
+      "queries": 246,
+      "map_at_k": {
+        "retriever": 0.22247779414561972,
+        "reranker": 0.1670200668192676,
+        "rationale": 0.19806380151231764
+      },
+      "recall_at_k": {
+        "retriever": 0.6788617886178862,
+        "reranker": 0.6788617886178862,
+        "rationale": 0.6788617886178862
+      },
+      "deltas": {
+        "reranker-retriever": {
+          "mean": -0.05545772732635192,
+          "ci95": [
+            -0.09897439404202639,
+            -0.01185039514684431
+          ],
+          "questions": 163,
+          "queries": 246
+        },
+        "rationale-reranker": {
+          "mean": 0.031043734693049843,
+          "ci95": [
+            -0.003074380947423794,
+            0.06690627178968413
+          ],
+          "questions": 163,
+          "queries": 246
+        },
+        "rationale-retriever": {
+          "mean": -0.024413992633302073,
+          "ci95": [
+            -0.06848263105005954,
+            0.01890521893327721
+          ],
+          "questions": 163,
+          "queries": 246
+        }
+      }
+    }
+  },
+  "recall_curve": {
+    "retriever": [
+      0.10826542491268917,
+      0.20139697322467986,
+      0.2689173457508731,
+      0.3213038416763679,
+      0.37485448195576254,
+      0.4109429569266589,
+      0.4412107101280559,
+      0.46449359720605354,
+      0.4889406286379511,
+      0.5122235157159488,
+      0.5308498253783469,
+      0.5518044237485448,
+      0.5692665890570431,
+      0.5797438882421421,
+      0.5972060535506403,
+      0.6146682188591386,
+      0.6274738067520372,
+      0.6367869615832363,
+      0.6426076833527358,
+      0.6495925494761351,
+      0.6577415599534342,
+      0.6647264260768335,
+      0.6775320139697323,
+      0.6880093131548312,
+      0.6903376018626309
+    ],
+    "reranker": [
+      0.14435389988358557,
+      0.2351571594877765,
+      0.2991850989522701,
+      0.3480791618160652,
+      0.3841676367869616,
+      0.420256111757858,
+      0.43888242142025613,
+      0.4575087310826543,
+      0.48661233993015135,
+      0.5040745052386496,
+      0.529685681024447,
+      0.5459837019790454,
+      0.5715948777648429,
+      0.5960419091967404,
+      0.610011641443539,
+      0.6239813736903376,
+      0.6367869615832363,
+      0.6449359720605355,
+      0.6530849825378346,
+      0.6589057043073341,
+      0.6670547147846333,
+      0.6775320139697323,
+      0.6798603026775321,
+      0.6845168800931315,
+      0.6903376018626309
+    ],
+    "rationale": [
+      0.1420256111757858,
+      0.25261932479627475,
+      0.3131548311990687,
+      0.3492433061699651,
+      0.3946449359720605,
+      0.42840512223515714,
+      0.459837019790454,
+      0.4807916181606519,
+      0.5052386495925495,
+      0.5227008149010477,
+      0.5436554132712457,
+      0.5611175785797439,
+      0.5774155995343423,
+      0.5867287543655413,
+      0.59953434225844,
+      0.6053550640279395,
+      0.6204889406286379,
+      0.6332945285215367,
+      0.6391152502910361,
+      0.6542491268917345,
+      0.6647264260768335,
+      0.6728754365541327,
+      0.6821885913853318,
+      0.6868451688009313,
+      0.6903376018626309
+    ]
+  },
+  "rank_bins": {
+    "retriever": {
+      "1": 93,
+      "2-5": 229,
+      "6-10": 118,
+      "11-25": 153,
+      "not_retrieved": 266
+    },
+    "reranker": {
+      "1": 124,
+      "2-5": 206,
+      "6-10": 103,
+      "11-25": 160,
+      "not_retrieved": 266
+    },
+    "rationale": {
+      "1": 122,
+      "2-5": 217,
+      "6-10": 110,
+      "11-25": 144,
+      "not_retrieved": 266
+    }
+  },
+  "per_query": {
+    "reranker-retriever": {
+      "higher": 277,
+      "same": 336,
+      "lower": 246
+    },
+    "rationale-reranker": {
+      "lower": 235,
+      "same": 396,
+      "higher": 228
+    }
+  },
+  "subjects_total": 124,
+  "largest_subjects": [
+    {
+      "subject": "Linear Equations",
+      "queries": 29,
+      "retriever": 0.2549808429118774,
+      "reranker": 0.2792990836548005,
+      "rationale": 0.2659036028204385
+    },
+    {
+      "subject": "Writing Expressions",
+      "queries": 28,
+      "retriever": 0.3179171668667467,
+      "reranker": 0.39750900360144054,
+      "rationale": 0.28393630179344465
+    },
+    {
+      "subject": "Mental Multiplication and Division",
+      "queries": 23,
+      "retriever": 0.14978545923725506,
+      "reranker": 0.10477593852879893,
+      "rationale": 0.236941454705271
+    },
+    {
+      "subject": "Linear Sequences (nth term)",
+      "queries": 22,
+      "retriever": 0.252729908979909,
+      "reranker": 0.17191427853192556,
+      "rationale": 0.18645817292062353
+    },
+    {
+      "subject": "BIDMAS",
+      "queries": 21,
+      "retriever": 0.3074143087186566,
+      "reranker": 0.2890371533228676,
+      "rationale": 0.26566515495086923
+    },
+    {
+      "subject": "Quadratic Equations",
+      "queries": 18,
+      "retriever": 0.18711419753086422,
+      "reranker": 0.2266093474426808,
+      "rationale": 0.22780182780182778
+    },
+    {
+      "subject": "Properties of Quadrilaterals",
+      "queries": 17,
+      "retriever": 0.4715940921823275,
+      "reranker": 0.39612511671335204,
+      "rationale": 0.3667366946778712
+    },
+    {
+      "subject": "Rounding to the Nearest Whole (10, 100, etc)",
+      "queries": 17,
+      "retriever": 0.1612868340809517,
+      "reranker": 0.5980392156862745,
+      "rationale": 0.48235294117647054
+    }
+  ],
+  "examples": {
+    "rationale_helped": [
+      {
+        "query_id": "1724_D",
+        "rationale": "The distractor suggests that the \"4\" represents thousands rather than hundreds, leading to an incorrect interpretation of its place value.",
+        "ranks": {
+          "retriever": 4,
+          "reranker": 16,
+          "rationale": 1
+        }
+      },
+      {
+        "query_id": "1724_B",
+        "rationale": "The distractor suggests that the \"4\" represents hundreds rather than tens, leading to an incorrect interpretation of its place value.",
+        "ranks": {
+          "retriever": 12,
+          "reranker": 14,
+          "rationale": 1
+        }
+      },
+      {
+        "query_id": "1743_D",
+        "rationale": "The distractor assumes that both increases should be applied sequentially without considering the compounded effect on the total amount.",
+        "ranks": {
+          "retriever": 3,
+          "reranker": 12,
+          "rationale": 1
+        }
+      }
+    ],
+    "rationale_hurt": [
+      {
+        "query_id": "69_C",
+        "rationale": "The reasoning error is assuming that because both towns have the same number of respondents (50), their data should be equally reliable without considering other factors like sample size or population size differences.",
+        "ranks": {
+          "retriever": 22,
+          "reranker": 1,
+          "rationale": 20
+        }
+      },
+      {
+        "query_id": "1743_C",
+        "rationale": "The distractor suggests increasing first by 60%, then by another 10% on the increased amount, which is incorrect because you should always apply the final percentage to the most recent value after all previous increases.",
+        "ranks": {
+          "retriever": 5,
+          "reranker": 1,
+          "rationale": 9
+        }
+      }
+    ]
+  },
+  "mean_rationale_words": 23.257275902211873
+}

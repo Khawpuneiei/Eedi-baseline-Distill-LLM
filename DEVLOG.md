@@ -236,3 +236,24 @@ No experiment has run.
 - Untested next steps: the 7B teacher, more reranker epochs, and a stronger retriever (e.g. bge-base).
   `results/logs/01_prepare_data.*` is from the first queue attempt (header bug, since fixed); the
   successful preparation was run by hand before the queue restarted.
+
+## 2026-10-03 — Result breakdown
+
+- Added `scripts/analyze_results.py` (tested), which recomputes everything below from the saved
+  per-query predictions into `results/analysis.json`. Intervals now resample whole questions (374),
+  which is the more conservative unit; the earlier query-level table above is superseded.
+- **Seen vs. unseen:** 246 / 859 validation queries (29%) need a misconception absent from training
+  (training covers 1,413 of 2,587 catalog entries). The reranker gains +0.062 [+0.028, +0.096] MAP@25 on
+  seen misconceptions and loses −0.056 [−0.099, −0.012] on unseen ones, so its overall gain comes from
+  memorising training labels. The rationale recovers +0.031 [−0.003, +0.067] on unseen ones: suggestive,
+  not significant.
+- **Rank bins:** gold at rank 1 for 93 / 124 / 122 queries (retriever / reranker / rationale); 266 not
+  retrieved in any condition.
+- **Per query, rationale vs reranker:** 228 ranked higher, 235 lower, 396 unchanged. The near-zero mean
+  hides many swaps both ways.
+- Smallest topics are too small to compare (17–29 queries each); "Mental Multiplication and Division"
+  and "Linear Sequences (nth term)" score lowest.
+- `results/report.html` is a self-contained chart page of these results.
+- Committed files cite examples by query ID only (no question, answer or label text), consistent with
+  keeping competition data out of Git. `analyze_results.py --include-text` writes a quoted version for
+  local use.
